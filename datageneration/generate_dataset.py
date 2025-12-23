@@ -1,11 +1,10 @@
-import argparse
 from openai import OpenAI
 from tqdm import tqdm
 import re
 import os
 import json
-
 import utils
+import argparse
 from config import Config
 from prompts import Prompts
 
