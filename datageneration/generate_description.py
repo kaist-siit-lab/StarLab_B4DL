@@ -102,13 +102,11 @@ class Description:
         front_images_base64 = utils.encode_images_to_base64(front_images)
         back_images_base64 = utils.encode_images_to_base64(back_images)
         
-        
         front_description = self.generate_description(front_images_base64, index, "FRONT")
         back_description = self.generate_description(back_images_base64, index, "BACK")
         
         generated_data = self.get_data_format(scene_token, sequence_id, front_description, back_description, None,index[0], index[-1])
             
-        
         return generated_data
 
 
@@ -154,7 +152,6 @@ def parse_args():
     parser.add_argument("--dataroot", type=str, default=Config.DATAROOT, help="Path to data root", dest="DATAROOT")
     parser.add_argument("--start_index", type=int, default=Config.START_INDEX, help="Start index for generating descriptions", dest="START_INDEX")
     parser.add_argument("--end_index", type=int, default=Config.END_INDEX, help="End index for generating descriptions", dest="END_INDEX")
-    
     
     return parser.parse_args()
 
