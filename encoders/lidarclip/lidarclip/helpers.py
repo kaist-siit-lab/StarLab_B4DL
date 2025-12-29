@@ -1,12 +1,8 @@
 import itertools
 import os
-
-import numpy as np
-
-import torch
-
 import clip
-
+import torch
+import numpy as np
 
 def logit_img_txt(img_feat, txt_feat, clip_model):
     img_feat = img_feat / img_feat.norm(dim=1, keepdim=True)
@@ -16,8 +12,8 @@ def logit_img_txt(img_feat, txt_feat, clip_model):
     logit_scale = clip_model.logit_scale.exp().float()
     logits_per_image = logit_scale * img_feat.float() @ txt_feat.t().float()
     logits_per_text = logits_per_image.t()
+    
     return logits_per_text, logits_per_image
-
 
 def get_topk(prompts, k, img_feats, lidar_feats, joint_feats, clip_model, device):
     text = clip.tokenize(prompts).to(device)
@@ -34,7 +30,6 @@ def get_topk(prompts, k, img_feats, lidar_feats, joint_feats, clip_model, device
     _, joint_idxs = torch.topk(logits_per_text_j[0, :], k)
 
     return img_idxs.cpu().numpy(), pc_idxs.cpu().numpy(), joint_idxs.cpu().numpy()
-
 
 def get_topk_separate_prompts(
     image_prompts, lidar_prompts, k, img_feats, lidar_feats, clip_model, device
@@ -88,10 +83,8 @@ class MultiLoader:
         self.dataset_lens = [len(loader.dataset) for loader in loaders]
         self.bins = np.cumsum(self.dataset_lens).tolist()
         assert len(self.loaders) == len(self.dataset_lens)
-        # self.dataset = self
-
+        
     def __getitem__(self, idx):
-        # Which loader should we look at?
         dataset_idx = np.digitize(idx, self.bins)
         assert dataset_idx < len(self.loaders), f"dataset_idx is {dataset_idx}, idx is {idx}"
         idx_to_subtract = self.bins[dataset_idx]
