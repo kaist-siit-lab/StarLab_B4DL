@@ -1,13 +1,14 @@
 import os
-from openai import OpenAI
-import json
-import argparse
-from tqdm import tqdm
 import sys
-
+import json
 import utils
-from prompts import Prompts
+import argparse
+
+from tqdm import tqdm
 from config import Config
+from openai import OpenAI
+from prompts import Prompts
+
 
 class Description:
     def __init__(self, cfg: Config):
@@ -155,6 +156,7 @@ def parse_args():
     
     return parser.parse_args()
 
+# example command line
 # python generate_description.py --json_path="./metadata/sequence_metadata.json" --option=split --save_dir="./generated_description_4500_5100" --start_index=4500 --end_index=4800
 
 def generate_description():
