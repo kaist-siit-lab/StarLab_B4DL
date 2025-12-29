@@ -19,11 +19,11 @@ def create_clean_directory(directory_path):
         shutil.rmtree(directory_path)  # Remove the existing directory and its contents
     os.makedirs(directory_path)  # Create a fresh directory
 
-
+# change to users data root path
 DEFAULT_DATA_PATHS = {
-    "once": "/proj/nlp4adas/datasets/once",
-    "nuscenes": "/mnt/nfs_shared_data/dataset/cch/nuScenes/",
-    "with_path": "/mnt/nfs_shared_data/dataset/cch/nuScenes/"
+    "once": "/path/to/dataset/once",
+    "nuscenes": "/path/to/dataset/nuScenes/",
+    "with_path": "/path/to/dataset/nuScenes/"
 }
 
 
@@ -63,12 +63,6 @@ def main(args):
     with open(args.frame_json_path, "r") as file:
         frame_data = json.load(file)
 
-#     lidar_path = f"{args.prefix}lidar.pt"
-
-#     if os.path.exists(lidar_path):
-#         print("Found existing files, skipping")
-#         return
-
     lidar_dict = {}
     with torch.no_grad():
         #formulate lidar feature dictionary matching with special tokens
@@ -79,7 +73,7 @@ def main(args):
             for lidar_feat, lidar_path in zip(lidar_features, pc_path):
                 lidar_dict[lidar_path] = lidar_feat.unsqueeze(0)
 
-#         IF extracting for stage 1
+        # IF extracting for stage 1
         create_clean_directory(args.stage1_save_dir)
         for d in tqdm(frame_data):
             for f in d["frames"]:
@@ -94,13 +88,11 @@ def main(args):
                 numpy_feature = frame_feature.cpu().detach().numpy()
                 np.save(frame_feature_save_path, numpy_feature)
                 
-#         IF extracting for stage 2 or 3
+        # IF extracting for stage 2 or 3
         create_clean_directory(args.stage2_save_dir)
         for d in tqdm(token_data):
             scene_id = d["scene_id"]
-            # scene_token = d["scene_token"]
             scene_length = d["num_frames"]
-            # frames = d["frames"]
             frames = d["paths"]["PATH_LIDAR_TOP"]
             feature_list = []
             for i in range(scene_length):
