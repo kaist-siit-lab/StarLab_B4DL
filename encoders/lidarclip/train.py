@@ -1,8 +1,5 @@
 import argparse
 import os
-# import sys
-# sys.path.append("./sst")
-
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
@@ -35,8 +32,10 @@ class LidarClip(pl.LightningModule):
         self.clip = clip_model
         self.batch_size = batch_size
         self.epoch_size = epoch_size
+        
         for param in self.clip.parameters():
             param.requires_grad = False
+        
         if loss == "mse":
             self.loss_func = F.mse_loss
         elif loss == "cosine":
@@ -67,7 +66,6 @@ class LidarClip(pl.LightningModule):
         scheduler = torch.optim.lr_scheduler.OneCycleLR(
             optimizer,
             max_lr=1e-3,
-            # total_steps=self.trainer.estimated_stepping_batches,
             pct_start=0.1,
             steps_per_epoch=steps_per_epoch,
             epochs=self.trainer.max_epochs,
@@ -107,7 +105,7 @@ def train(
         clip_preprocess,
         batch_size=batch_size,
         num_workers=num_workers,
-        split="trainval", #new, set split here
+        split="trainval",
         shuffle=True,
         nuscenes_datadir=nuscenes_datadir,
         nuscenes_split=nuscenes_split,
@@ -148,6 +146,7 @@ def train(
 
     if checkpoint_save_dir:
         checkpoint_save_dir = os.path.join(checkpoint_save_dir, str(wandb_logger.version))
+        
     checkpoint_callback = ModelCheckpoint(
         dirpath=checkpoint_save_dir,
         save_top_k=3,
@@ -168,13 +167,6 @@ def train(
         callbacks=[checkpoint_callback, learningrate_callback],
         resume_from_checkpoint=checkpoint_path,
     )
-    if trainer.global_rank == 0:
-        old_id = wandb_logger.experiment.config.get("slurm-id", "")
-        curr_id = os.environ.get("SLURM_JOB_ID", "unknown")
-        new_id = old_id + "-" + curr_id if len(old_id) else curr_id
-        wandb_logger.experiment.config.update({"slurm-id": new_id}, allow_val_change=True)
-
-    trainer.fit(model=model, train_dataloaders=train_loader)
 
 
 def parse_args():
