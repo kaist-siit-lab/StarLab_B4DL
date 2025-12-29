@@ -19,16 +19,6 @@ class GenerateDataset:
         self.save_path = os.path.join(self.dataroot, "generated_dataset", self.task)
         self.scene_metadata_path = cfg.SCENE_METADATA_PATH
         self.prompts = Prompts(cfg)
-        
-    def load_ids(self, file_path):
-        scene_ids = {}
-        scenes = utils.load_json(file_path)
-        
-        for scene in scenes:
-            scene_token = scene['scene_token']
-            scene_ids[scene_token] = scene['scene_id']
-        
-        return scene_ids
     
     def get_qa_pairs(self, conversations):
         conversations = re.sub(r'Q\d+:', 'Q:', conversations)
@@ -44,7 +34,17 @@ class GenerateDataset:
                 qa_pairs.append((question.strip(), answer.strip()))
     
         return qa_pairs
-    
+        
+    def load_ids(self, file_path):
+        scene_ids = {}
+        scenes = utils.load_json(file_path)
+        
+        for scene in scenes:
+            scene_token = scene['scene_token']
+            scene_ids[scene_token] = scene['scene_id']
+        
+        return scene_ids
+        
     def preprocessing(self, scene_id, scene_token, sequence_id, start_index, end_index, conversations):
         qa_pairs = self.get_qa_pairs(conversations)
         
